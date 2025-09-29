@@ -28,7 +28,6 @@ const App = () => (
               <Route path="/amigos" element={<Friends />} />
               <Route path="/chat" element={<div className="container mx-auto px-4 py-8"><h1 className="text-2xl font-bold">Chat - Próximamente</h1></div>} />
               <Route path="/biblioteca" element={<div className="container mx-auto px-4 py-8"><h1 className="text-2xl font-bold">Biblioteca - Próximamente</h1></div>} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
