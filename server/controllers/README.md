@@ -1,6 +1,6 @@
 # FLORTE Backend Controllers
 
-Este directorio contendrá los controladores de la API REST para FLORTE.
+Este directorio contendrá los controladores de la API REST para FLORTE
 
 ## Controladores Planificados
 

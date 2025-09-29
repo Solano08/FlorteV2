@@ -2,7 +2,7 @@
 
 ## Sobre FLORTE
 
-FLORTE es una plataforma educativa y red social diseñada para estudiantes y profesionales del ámbito tecnológico, especialmente aquellos vinculados al SENA (Servicio Nacional de Aprendizaje).
+FLORTE es una plataforma educativa y red social diseñada para estudiantes y profesionales del ámbito tecnológico vinculados al SENA (Servicio Nacional de Aprendizaje).
 
 ## Características Principales
 
