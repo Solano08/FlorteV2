@@ -1,5 +1,5 @@
 -- FLORTE Database Schema
--- Base de datos para la plataforma educativa FLORTE
+-- Base de datos para la plataforma educativa FLORTE.
 -- 
 -- Este archivo contiene el esquema completo de la base de datos
 -- que será implementado en MySQL
