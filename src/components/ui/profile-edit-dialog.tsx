@@ -36,8 +36,6 @@ export const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     aboutMe: profile?.aboutMe || '',
   });
 
-  const [errors, setErrors] = useState<Partial<UpdateProfileData>>({});
-
   React.useEffect(() => {
     if (profile) {
       setFormData({
@@ -50,45 +48,11 @@ export const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     }
   }, [profile]);
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<UpdateProfileData> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es requerido';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'El teléfono es requerido';
-    }
-
-    if (formData.githubUrl && !formData.githubUrl.startsWith('https://github.com/')) {
-      newErrors.githubUrl = 'Debe ser una URL válida de GitHub';
-    }
-
-    if (formData.linkedinUrl && !formData.linkedinUrl.startsWith('https://linkedin.com/')) {
-      newErrors.linkedinUrl = 'Debe ser una URL válida de LinkedIn';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-
     const success = await onSave(formData);
     if (success) {
       onClose();
-    }
-  };
-
-  const handleInputChange = (field: keyof UpdateProfileData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -96,122 +60,59 @@ export const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] florte-card-elevated animate-scale-in">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-foreground flex items-center">
-            <div className="w-8 h-8 rounded-full bg-gradient-primary mr-3 flex items-center justify-center">
-              <Save className="w-4 h-4 text-white" />
-            </div>
-            Editar Perfil
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Actualiza tu información personal. Los campos marcados con * son obligatorios.
+          <DialogTitle>Editar Perfil</DialogTitle>
+          <DialogDescription>
+            Actualiza tu información personal.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="profile-edit-form">
-          <div className="profile-edit-field">
-            <Label htmlFor="name" className="profile-edit-label">
-              Nombre completo *
-            </Label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nombre completo *</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              className="profile-edit-input"
-              placeholder="Ingresa tu nombre completo"
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               disabled={isUpdating}
             />
-            {errors.name && (
-              <p className="text-sm text-destructive mt-1">{errors.name}</p>
-            )}
           </div>
 
-          <div className="profile-edit-field">
-            <Label htmlFor="phone" className="profile-edit-label">
-              Teléfono *
-            </Label>
+          <div>
+            <Label htmlFor="phone">Teléfono *</Label>
             <Input
               id="phone"
               value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              className="profile-edit-input"
-              placeholder="+57 300 123 4567"
+              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
               disabled={isUpdating}
             />
-            {errors.phone && (
-              <p className="text-sm text-destructive mt-1">{errors.phone}</p>
-            )}
           </div>
 
-          <div className="profile-edit-field">
-            <Label htmlFor="githubUrl" className="profile-edit-label">
-              URL de GitHub
-            </Label>
+          <div>
+            <Label htmlFor="githubUrl">URL de GitHub</Label>
             <Input
               id="githubUrl"
               value={formData.githubUrl}
-              onChange={(e) => handleInputChange('githubUrl', e.target.value)}
-              className="profile-edit-input"
-              placeholder="https://github.com/tu-usuario"
+              onChange={(e) => setFormData(prev => ({ ...prev, githubUrl: e.target.value }))}
               disabled={isUpdating}
             />
-            {errors.githubUrl && (
-              <p className="text-sm text-destructive mt-1">{errors.githubUrl}</p>
-            )}
           </div>
 
-          <div className="profile-edit-field">
-            <Label htmlFor="linkedinUrl" className="profile-edit-label">
-              URL de LinkedIn
-            </Label>
-            <Input
-              id="linkedinUrl"
-              value={formData.linkedinUrl}
-              onChange={(e) => handleInputChange('linkedinUrl', e.target.value)}
-              className="profile-edit-input"
-              placeholder="https://linkedin.com/in/tu-perfil"
-              disabled={isUpdating}
-            />
-            {errors.linkedinUrl && (
-              <p className="text-sm text-destructive mt-1">{errors.linkedinUrl}</p>
-            )}
-          </div>
-
-          <div className="profile-edit-field">
-            <Label htmlFor="aboutMe" className="profile-edit-label">
-              Acerca de mí
-            </Label>
+          <div>
+            <Label htmlFor="aboutMe">Acerca de mí</Label>
             <Textarea
               id="aboutMe"
               value={formData.aboutMe}
-              onChange={(e) => handleInputChange('aboutMe', e.target.value)}
-              className="profile-edit-textarea"
-              placeholder="Cuéntanos sobre ti, tus intereses y objetivos profesionales..."
+              onChange={(e) => setFormData(prev => ({ ...prev, aboutMe: e.target.value }))}
               disabled={isUpdating}
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-border">
-            <FlorteButton
-              type="button"
-              variant="florte-outline"
-              onClick={onClose}
-              disabled={isUpdating}
-            >
-              <X className="w-4 h-4 mr-2" />
+          <div className="flex justify-end space-x-3">
+            <FlorteButton type="button" variant="florte-outline" onClick={onClose}>
               Cancelar
             </FlorteButton>
-            <FlorteButton
-              type="submit"
-              variant="florte"
-              disabled={isUpdating}
-              className="shadow-green"
-            >
-              {isUpdating ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4 mr-2" />
-              )}
-              {isUpdating ? 'Guardando...' : 'Guardar Cambios'}
+            <FlorteButton type="submit" variant="florte" disabled={isUpdating}>
+              {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar'}
             </FlorteButton>
           </div>
         </form>
