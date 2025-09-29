@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Header = () => {
   const location = useLocation();
@@ -59,8 +60,11 @@ const Header = () => {
 
           {/* Right side */}
           <div className="flex items-center space-x-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {/* Notifications */}
-            <FlorteButton variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <FlorteButton variant="florte-ghost" size="icon" className="text-white hover:bg-white/10">
               <Bell className="w-5 h-5" />
             </FlorteButton>
 

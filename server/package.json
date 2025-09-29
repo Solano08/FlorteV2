@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["florte", "social", "education", "api"],
+  "keywords": ["florte", "social", "education", "api", "sena"],
   "author": "FLORTE Team",
   "license": "MIT",
   "dependencies": {
@@ -17,5 +18,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
