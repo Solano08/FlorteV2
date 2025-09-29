@@ -1,32 +1,34 @@
-# FLORTE Frontend (Client)
+# 🍀Bienvenido a Florte Project
+Florte es un proyecto web enfocado en mejorar la interacción social y académica entre aprendices. Este repositorio contiene el aplicativo desarrollado con las mejores tecnologias.
 
-Este directorio contiene todo el código del frontend de FLORTE desarrollado en React, TypeScript y TailwindCSS.
+# 📌Información del proyecto
+Este proyecto lo diseñamos para que se pueda correr de una manera sencilla de forma local.
+A continuación, encontrarás los pasos necesarios para instalarlo y comenzar a disfrutar del aplicativo.
 
-## Estructura
+**URL**: https://github.com/Solano08/Florte2.0.git
 
-- `src/` - Código fuente de la aplicación React
-- `components/` - Componentes reutilizables
-- `pages/` - Páginas principales de la aplicación
-- `hooks/` - Custom hooks de React
-- `lib/` - Utilidades y configuraciones
+# 🚀Instalación y ejecución?
 
-## Tecnologías
+Sigue los siguientes pasos para iniciar el proyecto.
 
-- React 18
-- TypeScript
-- TailwindCSS
-- Vite
-- React Router DOM
-- Radix UI
+**Gracias por utilizar Florte**
 
-## Modo Oscuro
 
-La aplicación está configurada por defecto en modo oscuro, siguiendo el sistema de diseño de FLORTE con colores púrpura y verde institucional.
+```sh
+# Paso 1: Clona el repositorio desde la terminar con el siguiente comando.
+git clone https://github.com/Solano08/Florte2.0.git
 
-## Próximas funcionalidades
+# Paso 2: Navega por las carpetas hasta encontrar client.
+cd client
 
-- Sistema de autenticación
-- Chat en tiempo real
-- Gestión de grupos
-- Biblioteca de recursos
-- Sistema de notificaciones
+# Paso 3: Instala las dependencias necesarias.
+npm i
+
+# Paso 4: Inicia el proyecto y disfruta de Florte.
+npm run dev
+```
+
+
+📄 Licencia
+
+Este proyecto es de uso académico y personal.

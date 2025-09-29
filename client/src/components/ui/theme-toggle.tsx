@@ -1,13 +1,13 @@
 import React from "react"
 import { Moon, Sun } from "lucide-react"
-import { FlorteButton } from "@/components/ui/florte-button"
+import { FlorteButton } from "./../../components/ui/florte-button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useTheme } from "@/components/ui/theme-provider"
+} from "./../../components/ui/dropdown-menu"
+import { useTheme } from "./../../components/ui/theme-provider"
 
 export function ThemeToggle() {
   const { setTheme } = useTheme()

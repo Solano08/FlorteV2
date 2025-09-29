@@ -1,9 +1,9 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FlorteButton } from "@/components/ui/florte-button";
-import UserAvatar from "@/components/ui/user-avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "./../components/ui/card";
+import { FlorteButton } from "./../components/ui/florte-button";
+import UserAvatar from "./../components/ui/user-avatar";
 import { Users, Plus, Search, Settings, UserPlus } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "./../components/ui/input";
 
 const Groups = () => {
   const myGroups = [

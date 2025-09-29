@@ -1,8 +1,7 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FlorteButton } from "@/components/ui/florte-button";
-import StatsCard from "@/components/ui/stats-card";
-import UserAvatar from "@/components/ui/user-avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "./../components/ui/card";
+import { FlorteButton } from "./../components/ui/florte-button";
+import StatsCard from "./../components/ui/stats-card";
+import UserAvatar from "./../components/ui/user-avatar";
 import { 
   FolderOpen, 
   Users, 
@@ -16,7 +15,7 @@ import {
   MessageCircle,
   Share
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "./../components/ui/input";
 
 const Dashboard = () => {
   const trendingTopics = [

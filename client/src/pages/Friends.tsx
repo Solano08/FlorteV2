@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FlorteButton } from "@/components/ui/florte-button";
-import UserAvatar from "@/components/ui/user-avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "./../components/ui/card";
+import { FlorteButton } from "./../components/ui/florte-button";
+import UserAvatar from "./../components/ui/user-avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./../components/ui/tabs";
 import { Users, UserPlus, Search, MessageCircle, MoreHorizontal } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "./../components/ui/input";
 
 const Friends = () => {
   const [searchTerm, setSearchTerm] = useState("");

@@ -1,73 +1,34 @@
-# Welcome to your Lovable project
+# 🍀Bienvenido a Florte Project
+Florte es un proyecto web enfocado en mejorar la interacción social y académica entre aprendices. Este repositorio contiene el aplicativo desarrollado con las mejores tecnologias.
 
-## Project info
+# 📌Información del proyecto
+Este proyecto lo diseñamos para que se pueda correr de una manera sencilla de forma local.
+A continuación, encontrarás los pasos necesarios para instalarlo y comenzar a disfrutar del aplicativo.
 
-**URL**: https://lovable.dev/projects/56b1191f-4be1-439c-a669-4c1d89d4f50f
+**URL**: https://github.com/Solano08/Florte2.0.git
 
-## How can I edit this code?
+# 🚀Instalación y ejecución?
 
-There are several ways of editing your application.
+Sigue los siguientes pasos para iniciar el proyecto.
 
-**Use Lovable**
+**Gracias por utilizar Florte**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/56b1191f-4be1-439c-a669-4c1d89d4f50f) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Paso 1: Clona el repositorio desde la terminar con el siguiente comando.
+git clone https://github.com/Solano08/Florte2.0.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Paso 2: Navega por las carpetas hasta encontrar client.
+cd client
 
-# Step 3: Install the necessary dependencies.
+# Paso 3: Instala las dependencias necesarias.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Paso 4: Inicia el proyecto y disfruta de Florte.
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+📄 Licencia
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/56b1191f-4be1-439c-a669-4c1d89d4f50f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Este proyecto es de uso académico y personal.

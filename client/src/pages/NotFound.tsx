@@ -1,15 +1,8 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import { FlorteButton } from "@/components/ui/florte-button";
+import { Link } from "react-router-dom";
+import { FlorteButton } from "./../components/ui/florte-button";
 import { Home, ArrowLeft } from "lucide-react";
 
 const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="text-center space-y-6 max-w-md">
@@ -23,10 +16,10 @@ const NotFound = () => {
         
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <FlorteButton variant="florte" asChild>
-            <a href="/">
+            <Link to="/">
               <Home className="w-4 h-4 mr-2" />
               Ir al Inicio
-            </a>
+            </Link>
           </FlorteButton>
           <FlorteButton variant="florte-outline" onClick={() => window.history.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />
