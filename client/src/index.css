@@ -1,120 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* FLORTE Design System - Educational Social Platform */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
 
 @layer base {
   :root {
-    /* FLORTE Brand Colors - Light Mode */
     --background: 0 0% 100%;
-    --foreground: 220 13% 13%;
+    --foreground: 0 0% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 13%;
+    --card-foreground: 0 0% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 13%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 98 100% 33%;  /* Green institutional #39A900 */
+    --primary: 100 100% 33%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 13% 96%;  /* Light gray for secondary elements */
-    --secondary-foreground: 220 13% 13%;
+    --secondary: 100 45% 95%;
+    --secondary-foreground: 100 100% 20%;
 
-    --success: 142 86% 26%;   /* Dark green #007832 */
-    --success-foreground: 0 0% 100%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --info: 200 100% 15%;     /* Dark blue #00304D */
-    --info-foreground: 0 0% 100%;
-
-    --brand-purple: 291 47% 29%;  /* Purple #71277A */
-    --brand-purple-foreground: 0 0% 100%;
-
-    --muted: 220 13% 96%;
-    --muted-foreground: 220 9% 46%;
-
-    --accent: 98 100% 95%;  /* Very light green accent */
-    --accent-foreground: 220 13% 13%;
+    --accent: 100 50% 92%;
+    --accent-foreground: 100 100% 20%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 98 100% 33%;
+    --border: 0 0% 90%;
+    --input: 0 0% 94%;
+    --ring: 100 100% 33%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* FLORTE Gradients - Light Mode */
-    --gradient-primary: linear-gradient(135deg, hsl(98 100% 33%), hsl(98 100% 28%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 86% 26%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 13% 98%));
-    --gradient-accent: linear-gradient(135deg, hsl(98 100% 96%), hsl(98 100% 94%));
-
-    /* Light Mode Shadows - Soft and elegant */
-    --shadow-soft: 0 1px 3px 0 hsl(0 0% 0% / 0.05), 0 1px 2px -1px hsl(0 0% 0% / 0.05);
-    --shadow-medium: 0 4px 6px -1px hsl(0 0% 0% / 0.07), 0 2px 4px -2px hsl(0 0% 0% / 0.05);
-    --shadow-large: 0 10px 15px -3px hsl(0 0% 0% / 0.08), 0 4px 6px -4px hsl(0 0% 0% / 0.05);
-    --shadow-green: 0 4px 14px 0 hsl(98 100% 33% / 0.15);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --brand: 100 100% 33%;
+    --brand-hover: 100 100% 28%;
+    --brand-light: 100 50% 96%;
+    
+    --shadow-hover: 100 100% 33%;
   }
 
   .dark {
-    /* FLORTE Dark Mode */
-    --background: 220 13% 9%;
-    --foreground: 220 13% 95%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
 
-    --card: 220 13% 11%;
-    --card-foreground: 220 13% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 220 13% 11%;
-    --popover-foreground: 220 13% 95%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 262 83% 65%;  /* Purple for dark mode */
-    --primary-foreground: 220 13% 9%;
+    --primary: 100 100% 33%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 13% 15%;
-    --secondary-foreground: 220 13% 95%;
+    --secondary: 100 30% 20%;
+    --secondary-foreground: 0 0% 95%;
 
-    --success: 142 86% 32%;
-    --success-foreground: 220 13% 9%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
 
-    --info: 200 100% 25%;
-    --info-foreground: 220 13% 9%;
+    --accent: 100 30% 18%;
+    --accent-foreground: 0 0% 95%;
 
-    --brand-purple: 291 47% 35%;
-    --brand-purple-foreground: 220 13% 95%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --muted: 220 13% 15%;
-    --muted-foreground: 220 9% 60%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 100 100% 33%;
 
-    --accent: 220 13% 15%;
-    --accent-foreground: 220 13% 95%;
-
-    --destructive: 0 84% 65%;
-    --destructive-foreground: 220 13% 9%;
-
-    --border: 220 13% 18%;
-    --input: 220 13% 18%;
-    --ring: 262 83% 65%;
-
-    /* Dark mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 65%), hsl(291 47% 35%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 42%), hsl(142 86% 32%));
-    --gradient-card: linear-gradient(135deg, hsl(220 13% 11%), hsl(220 13% 13%));
-    --gradient-accent: linear-gradient(135deg, hsl(220 13% 13%), hsl(220 13% 15%));
-
-    /* Dark shadows */
-    --shadow-soft: 0 2px 15px -3px hsl(0 0% 0% / 0.3), 0 10px 20px -2px hsl(0 0% 0% / 0.2);
-    --shadow-medium: 0 4px 20px -2px hsl(0 0% 0% / 0.4), 0 15px 25px -5px hsl(0 0% 0% / 0.3);
-    --shadow-large: 0 10px 40px -15px hsl(0 0% 0% / 0.5);
-    --shadow-green: 0 4px 14px 0 hsl(262 83% 65% / 0.25);
+    --brand: 100 100% 33%;
+    --brand-hover: 100 100% 28%;
+    --brand-light: 100 30% 15%;
+    
+    --shadow-hover: 100 100% 33%;
   }
 }
 
@@ -124,102 +88,73 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  }
-}
-
-@layer components {
-  /* FLORTE Component Styles */
-  .florte-gradient {
-    background: var(--gradient-primary);
-  }
-  
-  .florte-card {
-    background: var(--gradient-card);
-    box-shadow: var(--shadow-soft);
-    border: 1px solid hsl(var(--border));
-  }
-  
-  .florte-card-elevated {
-    background: var(--gradient-card);
-    box-shadow: var(--shadow-medium);
-    border: 1px solid hsl(var(--border));
-  }
-  
-  .florte-transition {
-    transition: var(--transition-smooth);
-  }
-  
-  .florte-bounce {
-    transition: var(--transition-bounce);
-  }
-
-  .profile-edit-form {
-    @apply space-y-4 p-6;
-  }
-
-  .profile-edit-field {
-    @apply space-y-2;
-  }
-
-  .profile-edit-label {
-    @apply text-sm font-medium text-foreground;
-  }
-
-  .profile-edit-input {
-    @apply w-full px-3 py-2 border border-input bg-background text-foreground rounded-md shadow-sm focus:ring-2 focus:ring-ring focus:border-transparent;
-  }
-
-  .profile-edit-textarea {
-    @apply w-full px-3 py-2 border border-input bg-background text-foreground rounded-md shadow-sm focus:ring-2 focus:ring-ring focus:border-transparent min-h-[100px] resize-none;
+    @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
-  /* Custom animations for FLORTE */
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+  .shadow-hover-effect {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  .animate-slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  .shadow-hover-effect:hover {
+    box-shadow: 0 10px 30px -10px hsl(var(--shadow-hover) / 0.4);
+    transform: translateY(-2px);
   }
 
-  .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
-}
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+  .dark .glass-effect {
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .glass-input {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+  .glass-input:focus {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+
+  .dark .glass-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass-input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: hsl(var(--primary) / 0.5);
+  }
+
+  .glass-button {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  .dark .glass-button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass-button:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 }
