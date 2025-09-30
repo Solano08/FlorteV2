@@ -14,10 +14,6 @@ export default {
       },
     },
     extend: {
-      fontFamily: {
-        sans: ['Work Sans', 'system-ui', 'sans-serif'],
-        'work-sans': ['Work Sans', 'system-ui', 'sans-serif'],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -31,18 +27,6 @@ export default {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
-        },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        info: {
-          DEFAULT: "hsl(var(--info))",
-          foreground: "hsl(var(--info-foreground))",
-        },
-        "brand-purple": {
-          DEFAULT: "hsl(var(--brand-purple))",
-          foreground: "hsl(var(--brand-purple-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -64,18 +48,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-      },
-      backgroundImage: {
-        'gradient-primary': 'var(--gradient-primary)',
-        'gradient-success': 'var(--gradient-success)',
-        'gradient-card': 'var(--gradient-card)',
-        'gradient-accent': 'var(--gradient-accent)',
-      },
-      boxShadow: {
-        'soft': 'var(--shadow-soft)',
-        'medium': 'var(--shadow-medium)',
-        'large': 'var(--shadow-large)',
-        'green': 'var(--shadow-green)',
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          hover: "hsl(var(--brand-hover))",
+          light: "hsl(var(--brand-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -100,11 +77,11 @@ export default {
           },
         },
       },
-        animation: {
-          "accordion-down": "accordion-down 0.2s ease-out",
-          "accordion-up": "accordion-up 0.2s ease-out",
-        },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
-    plugins: [tailwindcssAnimate],
-  } satisfies Config;
+  },
+  plugins: [tailwindcssAnimate],
+} satisfies Config;
