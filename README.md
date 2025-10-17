@@ -2,7 +2,7 @@
 Florte es un proyecto web enfocado en mejorar la interacción social y académica entre aprendices. Este repositorio contiene el aplicativo desarrollado con las mejores tecnologias.
 
 # 📌Información del proyecto
-Este proyecto lo diseñamos para que se pueda correr de una manera sencilla de forma local.
+Diseñado para que se pueda correr de una manera sencilla de forma local.
 A continuación, encontrarás los pasos necesarios para instalarlo y comenzar a disfrutar del aplicativo.
 
 **URL**: https://github.com/Solano08/FlorteV2.git
