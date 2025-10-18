@@ -1,3 +1,4 @@
+
 # 🍀Bienvenido a Florte Project
 Florte es un proyecto web enfocado en mejorar la interacción social y académica entre aprendices. Este repositorio contiene el aplicativo desarrollado con las mejores tecnologias.
 
@@ -32,3 +33,5 @@ npm run dev
 📄 Licencia
 
 Este proyecto es de uso académico y personal.
+
+    
