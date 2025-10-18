@@ -32,3 +32,6 @@ VALUES (
 SELECT * FROM usuarios;
 
 ALTER TABLE usuarios ADD COLUMN deleted_at TIMESTAMP NULL DEFAULT NULL;
+ALTER TABLE usuarios 
+  ADD COLUMN password_bcrypt VARCHAR(255) NULL,
+  ADD COLUMN rol ENUM('user','admin') NOT NULL DEFAULT 'user';

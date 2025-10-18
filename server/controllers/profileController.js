@@ -1,6 +1,7 @@
+// server/controllers/profileController.js
 const db = require("../config/db");
 
-// ✅ Obtener perfil por ID (ignora eliminados con soft delete)
+// Obtener perfil por ID (público)
 exports.getProfile = (req, res) => {
   const userId = req.params.id;
 
@@ -22,9 +23,16 @@ exports.getProfile = (req, res) => {
   );
 };
 
-// ✅ Actualizar perfil por ID (ignora eliminados)
+// Actualizar perfil por ID (propietario o admin)
 exports.updateProfile = (req, res) => {
-  const userId = req.params.id;
+  const userId = Number(req.params.id);
+  const requester = req.user;
+
+  if (!requester) return res.status(401).json({ error: "No autenticado" });
+  if (Number(requester.id) !== userId && requester.rol !== "admin") {
+    return res.status(403).json({ error: "No autorizado para editar este perfil" });
+  }
+
   const {
     nombre_completo,
     correo,
@@ -61,7 +69,7 @@ exports.updateProfile = (req, res) => {
           .json({ error: "Usuario no encontrado o ya eliminado" });
       }
 
-      // 🔄 Devolver el perfil actualizado
+      // devolver perfil actualizado
       db.query(
         "SELECT * FROM usuarios WHERE id = ? AND deleted_at IS NULL",
         [userId],
@@ -77,9 +85,15 @@ exports.updateProfile = (req, res) => {
   );
 };
 
-// ✅ Soft delete (marca deleted_at en lugar de borrar físicamente)
+// Soft delete (propietario o admin)
 exports.deleteProfile = (req, res) => {
-  const userId = req.params.id;
+  const userId = Number(req.params.id);
+  const requester = req.user;
+
+  if (!requester) return res.status(401).json({ error: "No autenticado" });
+  if (Number(requester.id) !== userId && requester.rol !== "admin") {
+    return res.status(403).json({ error: "No autorizado para eliminar este perfil" });
+  }
 
   db.query(
     "UPDATE usuarios SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL",
@@ -96,21 +110,25 @@ exports.deleteProfile = (req, res) => {
           .json({ error: "Usuario no encontrado o ya eliminado" });
       }
 
-      // 🔄 Devolver el perfil (ya eliminado con deleted_at)
       db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, results) => {
         if (err) {
           console.error("❌ Error al obtener perfil eliminado:", err);
           return res.status(500).json({ error: "Error al obtener perfil eliminado" });
         }
-        res.json(results[0]); // 👈 Devuelve el perfil marcado como eliminado
+        res.json(results[0]);
       });
     }
   );
 };
 
-// ✅ Restaurar perfil (quita deleted_at)
+// Restaurar perfil (solo admin; además route usa permitRoles('admin'))
 exports.restoreProfile = (req, res) => {
-  const userId = req.params.id;
+  const userId = Number(req.params.id);
+  const requester = req.user;
+  if (!requester) return res.status(401).json({ error: "No autenticado" });
+  if (requester.rol !== "admin") {
+    return res.status(403).json({ error: "No autorizado para restaurar perfiles" });
+  }
 
   db.query(
     "UPDATE usuarios SET deleted_at = NULL WHERE id = ? AND deleted_at IS NOT NULL",
@@ -127,7 +145,6 @@ exports.restoreProfile = (req, res) => {
           .json({ error: "Usuario no encontrado o no estaba eliminado" });
       }
 
-      // 🔄 Devolver perfil restaurado
       db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, results) => {
         if (err) {
           console.error("❌ Error al obtener perfil restaurado:", err);

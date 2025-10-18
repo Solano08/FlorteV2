@@ -44,17 +44,25 @@ const EditProfileDialog = ({ open, onOpenChange, perfil, setPerfil }: Props) => 
     }));
   };
 
-  // ⚡ Guardar cambios en API
+  // ⚡ Guardar cambios en API con token
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Enviamos solo los campos permitidos (sin id ni fecha_union)
+      const token = localStorage.getItem("token"); // 🔑 recuperar token del login
+
+      if (!token) {
+        alert("No se encontró el token. Por favor, inicia sesión nuevamente.");
+        setLoading(false);
+        return;
+      }
+
       const { id, fecha_union, ...dataToSend } = formData;
 
       const res = await fetch(`http://localhost:5000/api/profile/${perfil.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // ✅ envío del token
         },
         body: JSON.stringify(dataToSend),
       });
@@ -63,7 +71,6 @@ const EditProfileDialog = ({ open, onOpenChange, perfil, setPerfil }: Props) => 
 
       const updatedPerfil = await res.json();
 
-      // ✅ Normalizamos para que siempre tenga la forma de PerfilData
       const normalizedPerfil: PerfilData = {
         id: updatedPerfil.id,
         nombre_completo: updatedPerfil.nombre_completo,
@@ -76,8 +83,8 @@ const EditProfileDialog = ({ open, onOpenChange, perfil, setPerfil }: Props) => 
         fecha_union: updatedPerfil.fecha_union,
       };
 
-      setPerfil(normalizedPerfil); // 🔄 actualizar estado en perfil.tsx
-      onOpenChange(false); // cerrar modal
+      setPerfil(normalizedPerfil);
+      onOpenChange(false);
     } catch (err) {
       console.error(err);
       alert("Hubo un error al guardar los cambios.");
