@@ -1,140 +1,126 @@
 const db = require("../config/db");
 
-// ✅ Obtener perfil por ID (ignora eliminados con soft delete)
-exports.getProfile = (req, res) => {
+const baseSelectFields =
+  "id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, deleted_at";
+
+exports.getProfile = async (req, res) => {
   const userId = req.params.id;
 
-  db.query(
-    "SELECT * FROM usuarios WHERE id = ? AND deleted_at IS NULL",
-    [userId],
-    (err, results) => {
-      if (err) {
-        console.error("❌ Error en la consulta:", err);
-        return res.status(500).json({ error: "Error en la base de datos" });
-      }
+  try {
+    const [rows] = await db.execute(
+      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ? AND deleted_at IS NULL`,
+      [userId]
+    );
 
-      if (results.length === 0) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
-
-      res.json(results[0]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
-  );
+
+    return res.json(rows[0]);
+  } catch (error) {
+    console.error("❌ Error en la consulta:", error);
+    return res.status(500).json({ error: "Error en la base de datos" });
+  }
 };
 
-// ✅ Actualizar perfil por ID (ignora eliminados)
-exports.updateProfile = (req, res) => {
+exports.updateProfile = async (req, res) => {
   const userId = req.params.id;
-  const {
-    nombre_completo,
-    correo,
-    bio,
-    github_url,
-    linkedin_url,
-    ubicacion,
-    ocupacion,
-  } = req.body;
+  const allowedFields = [
+    "nombre_completo",
+    "correo",
+    "bio",
+    "github_url",
+    "linkedin_url",
+    "ubicacion",
+    "ocupacion",
+    "avatar_url",
+  ];
 
-  db.query(
-    `UPDATE usuarios 
-     SET nombre_completo=?, correo=?, bio=?, github_url=?, linkedin_url=?, ubicacion=?, ocupacion=?
-     WHERE id=? AND deleted_at IS NULL`,
-    [
-      nombre_completo,
-      correo,
-      bio,
-      github_url,
-      linkedin_url,
-      ubicacion,
-      ocupacion,
-      userId,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("❌ Error en actualización:", err);
-        return res.status(500).json({ error: "Error al actualizar perfil" });
-      }
-
-      if (result.affectedRows === 0) {
-        return res
-          .status(404)
-          .json({ error: "Usuario no encontrado o ya eliminado" });
-      }
-
-      // 🔄 Devolver el perfil actualizado
-      db.query(
-        "SELECT * FROM usuarios WHERE id = ? AND deleted_at IS NULL",
-        [userId],
-        (err, results) => {
-          if (err) {
-            console.error("❌ Error al obtener perfil actualizado:", err);
-            return res.status(500).json({ error: "Error al obtener perfil" });
-          }
-          res.json(results[0]);
-        }
-      );
-    }
+  const entries = Object.entries(req.body).filter(([key, value]) =>
+    allowedFields.includes(key) && value !== undefined
   );
+
+  if (entries.length === 0) {
+    return res.status(400).json({ error: "No hay campos válidos para actualizar." });
+  }
+
+  const setClause = entries.map(([key]) => `${key} = ?`).join(", ");
+  const values = entries.map(([, value]) => value);
+
+  try {
+    const [result] = await db.execute(
+      `UPDATE usuarios SET ${setClause} WHERE id = ? AND deleted_at IS NULL`,
+      [...values, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Usuario no encontrado o ya eliminado" });
+    }
+
+    const [rows] = await db.execute(
+      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ?`,
+      [userId]
+    );
+
+    return res.json(rows[0]);
+  } catch (error) {
+    console.error("❌ Error en actualización:", error);
+    return res.status(500).json({ error: "Error al actualizar perfil" });
+  }
 };
 
-// ✅ Soft delete (marca deleted_at en lugar de borrar físicamente)
-exports.deleteProfile = (req, res) => {
+exports.deleteProfile = async (req, res) => {
   const userId = req.params.id;
 
-  db.query(
-    "UPDATE usuarios SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL",
-    [userId],
-    (err, result) => {
-      if (err) {
-        console.error("❌ Error al eliminar perfil:", err);
-        return res.status(500).json({ error: "Error al eliminar perfil" });
-      }
+  try {
+    const [result] = await db.execute(
+      "UPDATE usuarios SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL",
+      [userId]
+    );
 
-      if (result.affectedRows === 0) {
-        return res
-          .status(404)
-          .json({ error: "Usuario no encontrado o ya eliminado" });
-      }
-
-      // 🔄 Devolver el perfil (ya eliminado con deleted_at)
-      db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, results) => {
-        if (err) {
-          console.error("❌ Error al obtener perfil eliminado:", err);
-          return res.status(500).json({ error: "Error al obtener perfil eliminado" });
-        }
-        res.json(results[0]); // 👈 Devuelve el perfil marcado como eliminado
-      });
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Usuario no encontrado o ya eliminado" });
     }
-  );
+
+    const [rows] = await db.execute(
+      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ?`,
+      [userId]
+    );
+
+    return res.json(rows[0]);
+  } catch (error) {
+    console.error("❌ Error al eliminar perfil:", error);
+    return res.status(500).json({ error: "Error al eliminar perfil" });
+  }
 };
 
-// ✅ Restaurar perfil (quita deleted_at)
-exports.restoreProfile = (req, res) => {
+exports.restoreProfile = async (req, res) => {
   const userId = req.params.id;
 
-  db.query(
-    "UPDATE usuarios SET deleted_at = NULL WHERE id = ? AND deleted_at IS NOT NULL",
-    [userId],
-    (err, result) => {
-      if (err) {
-        console.error("❌ Error al restaurar perfil:", err);
-        return res.status(500).json({ error: "Error al restaurar perfil" });
-      }
+  try {
+    const [result] = await db.execute(
+      "UPDATE usuarios SET deleted_at = NULL WHERE id = ? AND deleted_at IS NOT NULL",
+      [userId]
+    );
 
-      if (result.affectedRows === 0) {
-        return res
-          .status(404)
-          .json({ error: "Usuario no encontrado o no estaba eliminado" });
-      }
-
-      // 🔄 Devolver perfil restaurado
-      db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, results) => {
-        if (err) {
-          console.error("❌ Error al obtener perfil restaurado:", err);
-          return res.status(500).json({ error: "Error al obtener perfil restaurado" });
-        }
-        res.json(results[0]);
-      });
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Usuario no encontrado o no estaba eliminado" });
     }
-  );
+
+    const [rows] = await db.execute(
+      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ?`,
+      [userId]
+    );
+
+    return res.json(rows[0]);
+  } catch (error) {
+    console.error("❌ Error al restaurar perfil:", error);
+    return res.status(500).json({ error: "Error al restaurar perfil" });
+  }
 };
