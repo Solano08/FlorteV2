@@ -1,20 +1,24 @@
-// server/config/db.js
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",       // ⚡ cambia si tu usuario es otro
-  password: "",       // ⚡ pon la clave de MySQL si tienes
-  database: "FlorteDB",
-  port: 3306,
+const pool = mysql.createPool({
+  host: process.env.DB_HOST ?? "localhost",
+  user: process.env.DB_USER ?? "root",
+  password: process.env.DB_PASSWORD ?? "",
+  database: process.env.DB_NAME ?? "FlorteDB",
+  port: Number(process.env.DB_PORT ?? 3306),
+  waitForConnections: true,
+  connectionLimit: Number(process.env.DB_CONNECTION_LIMIT ?? 10),
+  queueLimit: 0,
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error("❌ Error de conexión:", err);
-    return;
+(async () => {
+  try {
+    const connection = await pool.getConnection();
+    console.log("✅ Conectado a la BD MySQL");
+    connection.release();
+  } catch (error) {
+    console.error("❌ Error de conexión a la BD:", error.message);
   }
-  console.log("✅ Conectado a la BD MySQL");
-});
+})();
 
-module.exports = db;
+module.exports = pool;

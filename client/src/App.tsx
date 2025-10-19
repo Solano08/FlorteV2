@@ -10,6 +10,12 @@ import Grupos from "./pages/Grupos";
 import Amigos from "./pages/Amigos";
 import ChatsPrivados from "./pages/ChatsPrivados";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import AuthRedirect from "./components/Auth/AuthRedirect";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -17,20 +23,87 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/grupos" element={<Grupos />} />
-            <Route path="/amigos" element={<Amigos />} />
-            <Route path="/chats" element={<ChatsPrivados />} />
-            <Route path="/biblioteca" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/perfil"
+                element={
+                  <ProtectedRoute>
+                    <Perfil />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/grupos"
+                element={
+                  <ProtectedRoute>
+                    <Grupos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/amigos"
+                element={
+                  <ProtectedRoute>
+                    <Amigos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/chats"
+                element={
+                  <ProtectedRoute>
+                    <ChatsPrivados />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/biblioteca"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <AuthRedirect>
+                    <Login />
+                  </AuthRedirect>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <AuthRedirect>
+                    <Register />
+                  </AuthRedirect>
+                }
+              />
+              <Route
+                path="/forgot-password"
+                element={
+                  <AuthRedirect>
+                    <ForgotPassword />
+                  </AuthRedirect>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
