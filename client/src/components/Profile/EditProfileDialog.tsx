@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { endpoints, handleResponse } from "../../lib/api";
 
 interface PerfilData {
   id: number;
@@ -20,6 +21,8 @@ interface PerfilData {
   ocupacion: string | null;
   correo: string;
   fecha_union: string;
+  avatar_url: string | null;
+  deleted_at?: string | null;
 }
 
 interface Props {
@@ -30,28 +33,31 @@ interface Props {
 }
 
 const EditProfileDialog = ({ open, onOpenChange, perfil, setPerfil }: Props) => {
-  const [formData, setFormData] = useState<PerfilData>(perfil);
+  const [formData, setFormData] = useState<PerfilData>({ ...perfil });
   const [loading, setLoading] = useState(false);
 
-  // ⚡ Manejar cambios en los inputs
+  useEffect(() => {
+    if (open) {
+      setFormData({ ...perfil });
+    }
+  }, [perfil, open]);
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // ⚡ Guardar cambios en API
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Enviamos solo los campos permitidos (sin id ni fecha_union)
-      const { id, fecha_union, ...dataToSend } = formData;
+      const { id, fecha_union, deleted_at, ...dataToSend } = formData;
 
-      const res = await fetch(`http://localhost:5000/api/profile/${perfil.id}`, {
+      const response = await fetch(endpoints.profile(perfil.id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -59,28 +65,12 @@ const EditProfileDialog = ({ open, onOpenChange, perfil, setPerfil }: Props) => 
         body: JSON.stringify(dataToSend),
       });
 
-      if (!res.ok) throw new Error("Error al actualizar perfil");
-
-      const updatedPerfil = await res.json();
-
-      // ✅ Normalizamos para que siempre tenga la forma de PerfilData
-      const normalizedPerfil: PerfilData = {
-        id: updatedPerfil.id,
-        nombre_completo: updatedPerfil.nombre_completo,
-        bio: updatedPerfil.bio ?? null,
-        github_url: updatedPerfil.github_url ?? null,
-        linkedin_url: updatedPerfil.linkedin_url ?? null,
-        ubicacion: updatedPerfil.ubicacion ?? null,
-        ocupacion: updatedPerfil.ocupacion ?? null,
-        correo: updatedPerfil.correo,
-        fecha_union: updatedPerfil.fecha_union,
-      };
-
-      setPerfil(normalizedPerfil); // 🔄 actualizar estado en perfil.tsx
-      onOpenChange(false); // cerrar modal
-    } catch (err) {
-      console.error(err);
-      alert("Hubo un error al guardar los cambios.");
+      const updatedPerfil = await handleResponse(response);
+      setPerfil(updatedPerfil);
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+      alert(error instanceof Error ? error.message : "Hubo un error al guardar los cambios.");
     } finally {
       setLoading(false);
     }
@@ -101,32 +91,39 @@ const EditProfileDialog = ({ open, onOpenChange, perfil, setPerfil }: Props) => 
             placeholder="Nombre completo"
           />
           <Input
+            name="correo"
+            type="email"
+            value={formData.correo}
+            onChange={handleChange}
+            placeholder="Correo"
+          />
+          <Input
             name="ocupacion"
-            value={formData.ocupacion || ""}
+            value={formData.ocupacion ?? ""}
             onChange={handleChange}
             placeholder="Ocupación"
           />
           <Input
             name="ubicacion"
-            value={formData.ubicacion || ""}
+            value={formData.ubicacion ?? ""}
             onChange={handleChange}
             placeholder="Ubicación"
           />
           <Textarea
             name="bio"
-            value={formData.bio || ""}
+            value={formData.bio ?? ""}
             onChange={handleChange}
             placeholder="Biografía"
           />
           <Input
             name="github_url"
-            value={formData.github_url || ""}
+            value={formData.github_url ?? ""}
             onChange={handleChange}
             placeholder="GitHub URL"
           />
           <Input
             name="linkedin_url"
-            value={formData.linkedin_url || ""}
+            value={formData.linkedin_url ?? ""}
             onChange={handleChange}
             placeholder="LinkedIn URL"
           />

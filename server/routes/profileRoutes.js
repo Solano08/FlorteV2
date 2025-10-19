@@ -1,17 +1,11 @@
 const express = require("express");
-const router = express.Router();
 const profileController = require("../controllers/profileController");
 
-// ✅ Obtener perfil por ID
-router.get("/profile/:id", profileController.getProfile);
+const router = express.Router();
 
-// ✅ Actualizar perfil por ID
-router.put("/profile/:id", profileController.updateProfile);
-
-// ✅ Eliminar perfil (soft delete)
-router.delete("/profile/:id", profileController.deleteProfile);
-
-// ✅ Restaurar perfil
-router.patch("/profile/:id/restore", profileController.restoreProfile);
+router.get("/:id", profileController.getProfile);
+router.put("/:id", profileController.updateProfile);
+router.delete("/:id", profileController.deleteProfile);
+router.patch("/:id/restore", profileController.restoreProfile);
 
 module.exports = router;
