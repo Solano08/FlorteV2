@@ -6,19 +6,24 @@ const hashPassword = (password) =>
 
 const sanitizeUser = (user) => {
   if (!user) return null;
-  const { contraseña: _password, ...rest } = user;
+  const { password_bcrypt: _password, ...rest } = user;
   return rest;
 };
 
+// ------------------ REGISTRO ------------------
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ error: "Nombre, correo y contraseña son requeridos." });
+    return res
+      .status(400)
+      .json({ error: "Nombre, correo y contraseña son requeridos." });
   }
 
   try {
     const normalizedEmail = email.toLowerCase();
+
+    // Verificar si ya existe el correo
     const [existing] = await db.execute(
       "SELECT id FROM usuarios WHERE correo = ?",
       [normalizedEmail]
@@ -28,14 +33,16 @@ exports.register = async (req, res) => {
       return res.status(409).json({ error: "El correo ya está registrado." });
     }
 
+    // Insertar el nuevo usuario
     const [result] = await db.execute(
-      `INSERT INTO usuarios (nombre_completo, correo, contraseña, fecha_union)
+      `INSERT INTO usuarios (nombre_completo, correo, password_bcrypt, fecha_union)
        VALUES (?, ?, ?, NOW())`,
       [name.trim(), normalizedEmail, hashPassword(password)]
     );
 
+    // Consultar el usuario recién creado
     const [rows] = await db.execute(
-      `SELECT id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union
+      `SELECT id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol
        FROM usuarios WHERE id = ?`,
       [result.insertId]
     );
@@ -47,16 +54,19 @@ exports.register = async (req, res) => {
   }
 };
 
+// ------------------ LOGIN ------------------
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: "Correo y contraseña son requeridos." });
+    return res
+      .status(400)
+      .json({ error: "Correo y contraseña son requeridos." });
   }
 
   try {
     const [rows] = await db.execute(
-      `SELECT id, nombre_completo, correo, contraseña, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union
+      `SELECT id, nombre_completo, correo, password_bcrypt, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol
        FROM usuarios WHERE correo = ? AND deleted_at IS NULL`,
       [email.toLowerCase()]
     );
@@ -67,7 +77,8 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
 
-    if (user.contraseña !== hashPassword(password)) {
+    // Comparar hash
+    if (user.password_bcrypt !== hashPassword(password)) {
       return res.status(401).json({ error: "Credenciales inválidas." });
     }
 
@@ -78,6 +89,7 @@ exports.login = async (req, res) => {
   }
 };
 
+// ------------------ RESTABLECER CONTRASEÑA ------------------
 exports.forgotPassword = async (req, res) => {
   const { email, newPassword } = req.body;
 
@@ -89,7 +101,7 @@ exports.forgotPassword = async (req, res) => {
 
   try {
     const [result] = await db.execute(
-      `UPDATE usuarios SET contraseña = ? WHERE correo = ? AND deleted_at IS NULL`,
+      `UPDATE usuarios SET password_bcrypt = ? WHERE correo = ? AND deleted_at IS NULL`,
       [hashPassword(newPassword), email.toLowerCase()]
     );
 

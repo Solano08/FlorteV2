@@ -5,7 +5,7 @@ CREATE TABLE usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre_completo VARCHAR(100) NOT NULL,
   correo VARCHAR(100) NOT NULL UNIQUE,
-  contraseña VARCHAR(64) NOT NULL, -- Guardar hash SHA2-256
+  contrasena VARCHAR(64) NOT NULL, -- Guardar hash SHA2-256
   avatar_url VARCHAR(255),
   bio TEXT,
   github_url VARCHAR(255),
