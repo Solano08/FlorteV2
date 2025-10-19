@@ -6,13 +6,50 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-const CLIENT_URL = process.env.CLIENT_URL ?? "http://localhost:5173";
+const parseOrigins = (value = "") =>
+  value
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const defaultOrigins = new Set([
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:4173",
+  ...parseOrigins(process.env.CLIENT_URL),
+]);
+
+const allowAllOrigins = defaultOrigins.has("*");
 
 app.use(
   cors({
-    origin: CLIENT_URL === "*" ? "*" : [CLIENT_URL, "http://localhost:5173"],
+    origin(origin, callback) {
+      if (allowAllOrigins || !origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (defaultOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      if (process.env.NODE_ENV !== "production") {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origen ${origin} no permitido por CORS`));
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
   })
 );
 

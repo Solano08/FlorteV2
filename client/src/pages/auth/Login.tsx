@@ -19,6 +19,18 @@ const Login = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const sanitizedEmail = email.trim().toLowerCase();
+    const sanitizedPassword = password.trim();
+
+    if (!sanitizedEmail || !sanitizedPassword) {
+      toast({
+        variant: "destructive",
+        title: "Campos incompletos",
+        description: "Ingresa tu correo y contraseña para continuar.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -27,7 +39,7 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
       });
 
       const data = await handleResponse(response);
@@ -42,10 +54,18 @@ const Login = () => {
       const redirectPath = state?.from?.pathname ?? "/";
       navigate(redirectPath, { replace: true });
     } catch (error) {
+      const description =
+        error instanceof TypeError ||
+        (error instanceof Error && error.message === "Failed to fetch")
+          ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+          : error instanceof Error
+            ? error.message
+            : "Intenta nuevamente";
+
       toast({
         variant: "destructive",
         title: "No se pudo iniciar sesión",
-        description: error instanceof Error ? error.message : "Intenta nuevamente",
+        description,
       });
     } finally {
       setLoading(false);

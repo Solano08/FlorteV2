@@ -30,6 +30,18 @@ const Register = () => {
       return;
     }
 
+    const sanitizedName = name.trim();
+    const sanitizedEmail = email.trim().toLowerCase();
+
+    if (!sanitizedName) {
+      toast({
+        variant: "destructive",
+        title: "Ingresa tu nombre completo",
+        description: "Necesitamos saber cómo llamarte dentro de la comunidad.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -38,7 +50,7 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name: sanitizedName, email: sanitizedEmail, password }),
       });
 
       const data = await handleResponse(response);
@@ -51,10 +63,18 @@ const Register = () => {
 
       navigate("/", { replace: true });
     } catch (error) {
+      const description =
+        error instanceof TypeError ||
+        (error instanceof Error && error.message === "Failed to fetch")
+          ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+          : error instanceof Error
+            ? error.message
+            : "Intenta nuevamente";
+
       toast({
         variant: "destructive",
         title: "No se pudo completar el registro",
-        description: error instanceof Error ? error.message : "Intenta nuevamente",
+        description,
       });
     } finally {
       setLoading(false);
@@ -82,7 +102,7 @@ const Register = () => {
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
-            placeholder="Ana García Rodríguez"
+            placeholder="Ingresa tu nombre completo"
           />
         </div>
 
