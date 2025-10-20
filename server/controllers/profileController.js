@@ -1,16 +1,14 @@
 const db = require("../config/db");
 const { buildPublicPath } = require("../utils/fileStorage");
+const {
+  parsePositiveInt,
+  normalizeString,
+  normalizeEmail,
+  isValidEmail,
+} = require("../utils/validation");
 
 const baseSelectFields =
   "id, nombre_completo, correo, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion, deleted_at";
-
-const parsePositiveInt = (value) => {
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    return null;
-  }
-  return parsed;
-};
 
 const loadProfile = async (userId) => {
   const [rows] = await db.execute(
@@ -99,12 +97,34 @@ exports.updateProfile = async (req, res) => {
     "portada_url",
   ];
 
-  const entries = Object.entries(req.body).filter(([key, value]) =>
-    allowedFields.includes(key) && value !== undefined
-  );
+  const entries = Object.entries(req.body)
+    .filter(([key, value]) => allowedFields.includes(key) && value !== undefined)
+    .map(([key, value]) => {
+      if (key === "correo") {
+        return [key, normalizeEmail(value)];
+      }
+      if (typeof value === "string") {
+        const normalized = normalizeString(value);
+        if (!normalized) {
+          return [key, key === "nombre_completo" ? "" : null];
+        }
+        return [key, normalized];
+      }
+      return [key, value];
+    });
 
   if (entries.length === 0) {
     return res.status(400).json({ error: "No hay campos validos para actualizar." });
+  }
+
+  const emailEntry = entries.find(([key]) => key === "correo");
+  if (emailEntry && !isValidEmail(emailEntry[1])) {
+    return res.status(400).json({ error: "Correo electronico no valido." });
+  }
+
+  const nameEntry = entries.find(([key]) => key === "nombre_completo");
+  if (nameEntry && !normalizeString(nameEntry[1])) {
+    return res.status(400).json({ error: "El nombre no puede estar vacio." });
   }
 
   const setClause = entries.map(([key]) => `${key} = ?`).join(", ");
@@ -122,9 +142,7 @@ exports.updateProfile = async (req, res) => {
         .json({ error: "Usuario no encontrado o ya eliminado" });
     }
 
-    const profile = await buildProfileResponse(userId);
-
-    return res.json(profile);
+    return res.json(await buildProfileResponse(userId));
   } catch (error) {
     console.error("Error en actualizacion de perfil:", error);
     return res.status(500).json({ error: "Error al actualizar perfil" });
@@ -150,9 +168,7 @@ exports.deleteProfile = async (req, res) => {
         .json({ error: "Usuario no encontrado o ya eliminado" });
     }
 
-    const profile = await buildProfileResponse(userId);
-
-    return res.json(profile);
+    return res.json({ id: userId, message: "Perfil eliminado correctamente." });
   } catch (error) {
     console.error("Error al eliminar perfil:", error);
     return res.status(500).json({ error: "Error al eliminar perfil" });

@@ -116,10 +116,10 @@ CREATE TABLE comentarios (
 
 INSERT INTO usuarios (nombre_completo, correo, password_bcrypt, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, rol, ultima_conexion)
 VALUES
-  ('David Esteban Solano', 'david@example.com', SHA2('123456', 256), NULL, NULL, 'Estudiante de desarrollo web, trabajando en Florte', 'https://github.com/Solano08', 'https://linkedin.com/in/solano08', 'Bogota, Colombia', 'Desarrollador Full Stack', 'aprendiz', CURRENT_TIMESTAMP),
-  ('Laura Martinez', 'laura@example.com', SHA2('123456', 256), NULL, NULL, 'Disenadora enfocada en experiencias simples', 'https://github.com/lauradev', 'https://linkedin.com/in/lauradev', 'Medellin, Colombia', 'Disenadora UX', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 2 HOUR)),
-  ('Carlos Ruiz', 'carlos@example.com', SHA2('123456', 256), NULL, NULL, 'Desarrollador backend apasionado por Node.js', 'https://github.com/carlosruiz', 'https://linkedin.com/in/carlosruiz', 'Cali, Colombia', 'Desarrollador Backend', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)),
-  ('Ana Torres', 'ana@example.com', SHA2('123456', 256), NULL, NULL, 'Instructora SENA en analisis de datos', 'https://github.com/anatorres', 'https://linkedin.com/in/anatorres', 'Bogota, Colombia', 'Instructora de Datos', 'instructor', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE));
+  ('David Esteban Solano', 'david@example.com', '$2a$10$19BUe4v.a1CW4k4EVWUjOuZdOJs0f.O9S3t/4qL1BgfZHNU8ZeXvy', NULL, NULL, 'Estudiante de desarrollo web, trabajando en Florte', 'https://github.com/Solano08', 'https://linkedin.com/in/solano08', 'Bogota, Colombia', 'Desarrollador Full Stack', 'aprendiz', CURRENT_TIMESTAMP),
+  ('Laura Martinez', 'laura@example.com', '$2a$10$19BUe4v.a1CW4k4EVWUjOuZdOJs0f.O9S3t/4qL1BgfZHNU8ZeXvy', NULL, NULL, 'Disenadora enfocada en experiencias simples', 'https://github.com/lauradev', 'https://linkedin.com/in/lauradev', 'Medellin, Colombia', 'Disenadora UX', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 2 HOUR)),
+  ('Carlos Ruiz', 'carlos@example.com', '$2a$10$19BUe4v.a1CW4k4EVWUjOuZdOJs0f.O9S3t/4qL1BgfZHNU8ZeXvy', NULL, NULL, 'Desarrollador backend apasionado por Node.js', 'https://github.com/carlosruiz', 'https://linkedin.com/in/carlosruiz', 'Cali, Colombia', 'Desarrollador Backend', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)),
+  ('Ana Torres', 'ana@example.com', '$2a$10$19BUe4v.a1CW4k4EVWUjOuZdOJs0f.O9S3t/4qL1BgfZHNU8ZeXvy', NULL, NULL, 'Instructora SENA en analisis de datos', 'https://github.com/anatorres', 'https://linkedin.com/in/anatorres', 'Bogota, Colombia', 'Instructora de Datos', 'instructor', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE));
 
 INSERT INTO proyectos (titulo, descripcion, estado)
 VALUES

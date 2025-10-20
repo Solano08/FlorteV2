@@ -1,16 +1,11 @@
 const db = require("../config/db");
+const { parsePositiveInt, normalizeString } = require("../utils/validation");
 
 const PROJECT_STATES = new Set(["activo", "completado", "archivado"]);
 
-const sanitizeText = (value) =>
-  typeof value === "string" ? value.trim() : value;
-
-const parsePositiveInt = (value) => {
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    return null;
-  }
-  return parsed;
+const sanitizeText = (value) => {
+  const normalized = normalizeString(value);
+  return normalized || null;
 };
 
 exports.listByUser = async (req, res) => {
@@ -135,7 +130,7 @@ exports.createProject = async (req, res) => {
 
   const normalizedState = PROJECT_STATES.has(estado) ? estado : "activo";
   const normalizedTitle = sanitizeText(titulo);
-  const normalizedDescription = sanitizeText(descripcion) || null;
+  const normalizedDescription = sanitizeText(descripcion);
   const normalizedRole = sanitizeText(rol) || "Lider";
 
   if (!normalizedTitle) {

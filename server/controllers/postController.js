@@ -1,15 +1,8 @@
 const db = require("../config/db");
 const { buildPublicPath } = require("../utils/fileStorage");
+const { parsePositiveInt } = require("../utils/validation");
 
 const REACTION_TYPES = new Set(["me_gusta", "apoyo", "divertido", "triste", "enojado"]);
-
-const parsePositiveInt = (value) => {
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    return null;
-  }
-  return parsed;
-};
 
 const formatReactionTotals = (rows) => {
   const totals = {};
@@ -71,39 +64,44 @@ exports.listFeed = async (req, res) => {
     }
 
     const postIds = posts.map((post) => post.id);
+    const placeholders = postIds.map(() => "?").join(",");
 
+    // 🔹 Obtener totales de reacciones
     const [reactionTotals] = await db.execute(
       `
         SELECT publicacion_id, tipo, COUNT(*) AS total
         FROM reacciones_publicacion
-        WHERE publicacion_id IN (?)
+        WHERE publicacion_id IN (${placeholders})
         GROUP BY publicacion_id, tipo
       `,
-      [postIds]
+      postIds
     );
 
+    // 🔹 Obtener reacciones del usuario (si hay userId)
     let userReactions = [];
     if (userId) {
       [userReactions] = await db.execute(
         `
           SELECT publicacion_id, tipo
           FROM reacciones_publicacion
-          WHERE usuario_id = ? AND publicacion_id IN (?)
+          WHERE usuario_id = ? AND publicacion_id IN (${placeholders})
         `,
-        [userId, postIds]
+        [userId, ...postIds]
       );
     }
 
+    // 🔹 Obtener conteo de comentarios
     const [commentCounts] = await db.execute(
       `
         SELECT publicacion_id, COUNT(*) AS total
         FROM comentarios
-        WHERE publicacion_id IN (?)
+        WHERE publicacion_id IN (${placeholders})
         GROUP BY publicacion_id
       `,
-      [postIds]
+      postIds
     );
 
+    // 🔹 Organizar resultados
     const reactionByPost = reactionTotals.reduce((acc, row) => {
       if (!acc[row.publicacion_id]) {
         acc[row.publicacion_id] = [];
@@ -122,6 +120,7 @@ exports.listFeed = async (req, res) => {
       return acc;
     }, {});
 
+    // 🔹 Formatear publicaciones finales
     const formattedPosts = posts.map((post) => {
       const reactions = formatReactionTotals(reactionByPost[post.id] ?? []);
       return {
@@ -163,11 +162,11 @@ exports.createPost = async (req, res) => {
   const type = typeof req.body.tipo === "string" ? req.body.tipo.trim() : "texto";
 
   if (!userId) {
-    return res.status(400).json({ error: "Usuario no valido." });
+    return res.status(400).json({ error: "Usuario no válido." });
   }
 
   if (!content && !req.file) {
-    return res.status(400).json({ error: "La publicacion debe tener texto o archivo adjunto." });
+    return res.status(400).json({ error: "La publicación debe tener texto o archivo adjunto." });
   }
 
   const allowedTypes = new Set(["texto", "imagen", "video"]);
@@ -242,8 +241,8 @@ exports.createPost = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error al crear publicacion:", error);
-    return res.status(500).json({ error: "No se pudo crear la publicacion." });
+    console.error("Error al crear publicación:", error);
+    return res.status(500).json({ error: "No se pudo crear la publicación." });
   }
 };
 
@@ -257,7 +256,7 @@ exports.reactToPost = async (req, res) => {
   }
 
   if (!REACTION_TYPES.has(reactionType)) {
-    return res.status(400).json({ error: "Tipo de reaccion no valido." });
+    return res.status(400).json({ error: "Tipo de reacción no válido." });
   }
 
   try {
@@ -320,8 +319,8 @@ exports.reactToPost = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error al reaccionar a la publicacion:", error);
-    return res.status(500).json({ error: "No se pudo registrar la reaccion." });
+    console.error("Error al reaccionar a la publicación:", error);
+    return res.status(500).json({ error: "No se pudo registrar la reacción." });
   }
 };
 
@@ -339,13 +338,10 @@ exports.addComment = async (req, res) => {
   }
 
   try {
-    const [postRows] = await db.execute(
-      "SELECT id FROM publicaciones WHERE id = ?",
-      [postId]
-    );
+    const [postRows] = await db.execute("SELECT id FROM publicaciones WHERE id = ?", [postId]);
 
     if (postRows.length === 0) {
-      return res.status(404).json({ error: "Publicacion no encontrada." });
+      return res.status(404).json({ error: "Publicación no encontrada." });
     }
 
     const mediaUrl = req.file ? buildPublicPath(req.file.filename) : null;
@@ -409,7 +405,7 @@ exports.getComments = async (req, res) => {
   const postId = parsePositiveInt(req.params.id);
 
   if (!postId) {
-    return res.status(400).json({ error: "Identificador de publicacion no valido." });
+    return res.status(400).json({ error: "Identificador de publicación no válido." });
   }
 
   try {

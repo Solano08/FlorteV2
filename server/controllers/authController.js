@@ -1,8 +1,20 @@
-const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 const db = require("../config/db");
+const {
+  normalizeEmail,
+  normalizeString,
+  isValidEmail,
+} = require("../utils/validation");
 
-const hashPassword = (password) =>
-  crypto.createHash("sha256").update(password).digest("hex");
+const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+
+const hashPassword = async (password) => {
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  return bcrypt.hash(password, salt);
+};
+
+const verifyPassword = (password, hash) =>
+  bcrypt.compare(password, hash);
 
 const sanitizeUser = (user) => {
   if (!user) return null;
@@ -21,11 +33,21 @@ exports.register = async (req, res) => {
   }
 
   try {
-    const normalizedEmail = email.toLowerCase().trim();
-    const normalizedName = name.trim();
+    const normalizedEmail = normalizeEmail(email);
+    const normalizedName = normalizeString(name);
+    const passwordValue =
+      typeof password === "string" ? password.trim() : String(password ?? "");
 
     if (!normalizedName) {
       return res.status(400).json({ error: "El nombre no puede estar vacio." });
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ error: "Formato de correo no valido." });
+    }
+
+    if (passwordValue.length < 6) {
+      return res.status(400).json({ error: "La contrasena debe tener al menos 6 caracteres." });
     }
 
     const [existing] = await db.execute(
@@ -40,7 +62,7 @@ exports.register = async (req, res) => {
     const [result] = await db.execute(
       `INSERT INTO usuarios (nombre_completo, correo, password_bcrypt, fecha_union, ultima_conexion)
        VALUES (?, ?, ?, NOW(), NOW())`,
-      [normalizedName, normalizedEmail, hashPassword(password)]
+      [normalizedName, normalizedEmail, await hashPassword(passwordValue)]
     );
 
     const [rows] = await db.execute(
@@ -67,7 +89,13 @@ exports.login = async (req, res) => {
   }
 
   try {
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = normalizeEmail(email);
+    const passwordValue =
+      typeof password === "string" ? password.trim() : String(password ?? "");
+
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ error: "Formato de correo no valido." });
+    }
 
     const [rows] = await db.execute(
       `SELECT id, nombre_completo, correo, password_bcrypt, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
@@ -81,7 +109,9 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
 
-    if (user.password_bcrypt !== hashPassword(password)) {
+    const isValidPassword = await verifyPassword(passwordValue, user.password_bcrypt);
+
+    if (!isValidPassword) {
       return res.status(401).json({ error: "Credenciales invalidas." });
     }
 
@@ -114,9 +144,25 @@ exports.forgotPassword = async (req, res) => {
   }
 
   try {
+    const normalizedEmail = normalizeEmail(email);
+    const passwordValue =
+      typeof newPassword === "string"
+        ? newPassword.trim()
+        : String(newPassword ?? "");
+
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ error: "Formato de correo no valido." });
+    }
+
+    if (passwordValue.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "La nueva contrasena debe tener al menos 6 caracteres." });
+    }
+
     const [result] = await db.execute(
       `UPDATE usuarios SET password_bcrypt = ? WHERE correo = ? AND deleted_at IS NULL`,
-      [hashPassword(newPassword), email.toLowerCase().trim()]
+      [await hashPassword(passwordValue), normalizedEmail]
     );
 
     if (result.affectedRows === 0) {

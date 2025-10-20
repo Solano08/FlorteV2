@@ -1,17 +1,10 @@
 const db = require("../config/db");
+const { parsePositiveInt } = require("../utils/validation");
 
 const ONLINE_THRESHOLD_MINUTES = 5;
 
-const parseUserId = (rawValue) => {
-  const parsed = Number(rawValue);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    return null;
-  }
-  return parsed;
-};
-
 exports.getOverview = async (req, res) => {
-  const userId = parseUserId(req.params.userId);
+  const userId = parsePositiveInt(req.params.userId);
 
   if (!userId) {
     return res.status(400).json({ error: "Identificador de usuario no valido." });
