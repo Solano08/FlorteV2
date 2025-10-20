@@ -9,6 +9,7 @@ import Perfil from "./pages/Perfil";
 import Grupos from "./pages/Grupos";
 import Amigos from "./pages/Amigos";
 import ChatsPrivados from "./pages/ChatsPrivados";
+import CrearProyecto from "./pages/CrearProyecto";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -49,6 +50,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Grupos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/proyectos/crear"
+                element={
+                  <ProtectedRoute>
+                    <CrearProyecto />
                   </ProtectedRoute>
                 }
               />

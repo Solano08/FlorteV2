@@ -19,6 +19,8 @@ export interface AuthUser {
   ubicacion: string | null;
   ocupacion: string | null;
   fecha_union: string;
+  rol: string | null;
+  ultima_conexion: string | null;
 }
 
 interface AuthContextValue {

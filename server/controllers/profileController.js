@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 const baseSelectFields =
-  "id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, deleted_at";
+  "id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion, deleted_at";
 
 exports.getProfile = async (req, res) => {
   const userId = req.params.id;

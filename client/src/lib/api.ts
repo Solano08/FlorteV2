@@ -7,6 +7,8 @@ export const endpoints = {
   register: `${API_BASE_URL}/auth/register`,
   forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
   profile: (id: number | string) => `${API_BASE_URL}/profile/${id}`,
+  dashboard: (id: number | string) => `${API_BASE_URL}/dashboard/${id}`,
+  projects: `${API_BASE_URL}/projects`,
 };
 
 export const handleResponse = async (response: Response) => {

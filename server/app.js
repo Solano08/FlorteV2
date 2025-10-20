@@ -1,8 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 
-const profileRoutes = require("./routes/profileRoutes");
 const authRoutes = require("./routes/authRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const projectRoutes = require("./routes/projectRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -62,6 +64,8 @@ app.get("/", (_req, res) => {
 
 app.use("/api/profile", profileRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 const PORT = Number(process.env.PORT ?? 5000);
 app.listen(PORT, () => {
