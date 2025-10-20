@@ -45,7 +45,10 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/register" element={<Navigate to="/" replace />} />
+      <Route path="/forgot-password" element={<Navigate to="/" replace />} />
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/grupos" element={<Grupos />} />
       <Route path="/proyectos/crear" element={<CrearProyecto />} />
