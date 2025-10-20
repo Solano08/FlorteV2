@@ -10,6 +10,7 @@ import Grupos from "./pages/Grupos";
 import Amigos from "./pages/Amigos";
 import ChatsPrivados from "./pages/ChatsPrivados";
 import CrearProyecto from "./pages/CrearProyecto";
+import ProyectoDetalle from "./pages/ProyectoDetalle";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -58,6 +59,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <CrearProyecto />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/proyectos/:projectId"
+                element={
+                  <ProtectedRoute>
+                    <ProyectoDetalle />
                   </ProtectedRoute>
                 }
               />

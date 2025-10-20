@@ -5,6 +5,8 @@ const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const postRoutes = require("./routes/postRoutes");
+const { uploadsDir } = require("./utils/fileStorage");
 
 const app = express();
 
@@ -57,15 +59,17 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(uploadsDir));
 
 app.get("/", (_req, res) => {
-  res.send("API de FlorteV2 funcionando 🚀");
+  res.send("API de FlorteV2 funcionando correcto");
 });
 
 app.use("/api/profile", profileRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/posts", postRoutes);
 
 const PORT = Number(process.env.PORT ?? 5000);
 app.listen(PORT, () => {

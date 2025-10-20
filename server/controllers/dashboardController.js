@@ -44,6 +44,18 @@ exports.getOverview = async (req, res) => {
       "SELECT tag, posts FROM hashtags ORDER BY posts DESC, id ASC LIMIT 5"
     );
 
+    const projectListPromise = db.execute(
+      `
+        SELECT p.id, p.titulo, p.estado, p.fecha_creacion
+        FROM proyectos p
+        INNER JOIN usuario_proyectos up ON up.proyecto_id = p.id
+        WHERE up.usuario_id = ?
+        ORDER BY p.fecha_creacion DESC
+        LIMIT 5
+      `,
+      [userId]
+    );
+
     const suggestionsPromise = db.execute(
       `
         SELECT u.id, u.nombre_completo, u.ocupacion
@@ -76,6 +88,7 @@ exports.getOverview = async (req, res) => {
       [connectionCountRows],
       [courseCountRows],
       [trendRows],
+      [projectRows],
       [suggestionRows],
       [mutualRows],
     ] = await Promise.all([
@@ -83,6 +96,7 @@ exports.getOverview = async (req, res) => {
       connectionCountPromise,
       courseCountPromise,
       trendsPromise,
+      projectListPromise,
       suggestionsPromise,
       mutualConnectionsPromise,
     ]);
@@ -107,6 +121,13 @@ exports.getOverview = async (req, res) => {
       role: row.ocupacion ?? "Aprendiz",
     }));
 
+    const projects = projectRows.map((row) => ({
+      id: row.id,
+      title: row.titulo,
+      status: row.estado,
+      createdAt: row.fecha_creacion,
+    }));
+
     const mutualConnections = mutualRows.map((row) => {
       const lastSeen = row.ultima_conexion ? new Date(row.ultima_conexion).getTime() : null;
       const isOnline = lastSeen ? now - lastSeen <= onlineWindowMs : false;
@@ -122,6 +143,7 @@ exports.getOverview = async (req, res) => {
     return res.json({
       stats,
       trends,
+      projects,
       suggestions,
       mutualConnections,
     });

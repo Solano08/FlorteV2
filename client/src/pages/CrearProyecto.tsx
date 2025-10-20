@@ -55,13 +55,13 @@ const CrearProyecto = () => {
 
       return handleResponse(response);
     },
-    onSuccess: () => {
+    onSuccess: (data: { project: { id: number } }) => {
       toast({
         title: "Proyecto creado",
         description: "Tu proyecto fue creado correctamente.",
       });
       queryClient.invalidateQueries({ queryKey: ["dashboard", user?.id] });
-      navigate("/");
+      navigate(`/proyectos/${data.project.id}`);
     },
     onError: (error) => {
       const description =

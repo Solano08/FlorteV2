@@ -5,10 +5,12 @@ import TrendingSidebar from "../components/Widgets/TrendingSidebar";
 import CreatePost from "../components/Feed/CreatePost";
 import PostCard from "../components/Feed/PostCard";
 import { Card } from "../components/ui/card";
+import { Skeleton } from "../components/ui/skeleton";
 import bannerImage from "../assets/florte-banner.jpg";
 import { endpoints, handleResponse } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/ui/use-toast";
+import type { FeedPost } from "../types/feed";
 
 type DashboardStats = {
   projects: number;
@@ -16,11 +18,23 @@ type DashboardStats = {
   courses: number;
 };
 
+type DashboardProject = {
+  id: number;
+  title: string;
+  status: string;
+  createdAt: string;
+};
+
 type DashboardResponse = {
   stats: DashboardStats;
+  projects: DashboardProject[];
   trends: Array<{ tag: string; posts: number }>;
   suggestions: Array<{ id: number; name: string; role: string }>;
   mutualConnections: Array<{ id: number; name: string; role: string; isOnline: boolean }>;
+};
+
+type FeedResponse = {
+  posts: FeedPost[];
 };
 
 const Index = () => {
@@ -51,6 +65,32 @@ const Index = () => {
     },
   });
 
+  const {
+    data: feedData,
+    isLoading: feedLoading,
+    error: feedError,
+  } = useQuery<FeedResponse>({
+    queryKey: ["feed", user?.id],
+    enabled: Boolean(user?.id),
+    retry: 1,
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (user?.id) {
+        params.set("userId", String(user.id));
+      }
+      const response = await fetch(endpoints.feed(params.toString()));
+      return handleResponse(response) as Promise<FeedResponse>;
+    },
+  });
+
+  if (feedError instanceof Error) {
+    toast({
+      variant: "destructive",
+      title: "Error al cargar publicaciones",
+      description: feedError.message,
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -58,7 +98,11 @@ const Index = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <aside className="lg:col-span-3">
-            <ProfileSidebar stats={dashboardData?.stats} isLoading={dashboardLoading} />
+            <ProfileSidebar
+              stats={dashboardData?.stats}
+              projects={dashboardData?.projects}
+              isLoading={dashboardLoading}
+            />
           </aside>
 
           <main className="lg:col-span-6 space-y-4">
@@ -76,15 +120,25 @@ const Index = () => {
               </div>
             </Card>
 
-            <CreatePost />
+            <CreatePost projects={dashboardData?.projects ?? []} />
 
-            <PostCard
-              author="Ana Garcia Rodriguez"
-              initials="AG"
-              date="15 de noviembre de 2023"
-              content="Acabamos de finalizar nuestro proyecto de gestion de inventarios! Fue increible trabajar con React y Node.js. Aprendi mucho sobre APIs RESTful y manejo de estados."
-              hasImage
-            />
+            {feedLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <Card key={`feed-skeleton-${index}`} className="p-6 space-y-4">
+                    <Skeleton className="h-6 w-40" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                  </Card>
+                ))}
+              </div>
+            ) : feedData?.posts?.length ? (
+              feedData.posts.map((post) => <PostCard key={post.id} post={post} />)
+            ) : (
+              <Card className="p-6 text-center text-muted-foreground">
+                Aun no hay publicaciones. Crea la primera!
+              </Card>
+            )}
           </main>
 
           <aside className="lg:col-span-3">

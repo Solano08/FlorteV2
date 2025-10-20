@@ -1,6 +1,9 @@
 CREATE DATABASE IF NOT EXISTS FlorteDB;
 USE FlorteDB;
 
+DROP TABLE IF EXISTS comentarios;
+DROP TABLE IF EXISTS reacciones_publicacion;
+DROP TABLE IF EXISTS publicaciones;
 DROP TABLE IF EXISTS usuario_cursos;
 DROP TABLE IF EXISTS usuario_proyectos;
 DROP TABLE IF EXISTS seguidores;
@@ -15,6 +18,7 @@ CREATE TABLE usuarios (
   correo VARCHAR(100) NOT NULL UNIQUE,
   password_bcrypt CHAR(64) NOT NULL,
   avatar_url VARCHAR(255),
+  portada_url VARCHAR(255),
   bio TEXT,
   github_url VARCHAR(255),
   linkedin_url VARCHAR(255),
@@ -76,12 +80,46 @@ CREATE TABLE hashtags (
   posts INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO usuarios (nombre_completo, correo, password_bcrypt, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, rol, ultima_conexion)
+CREATE TABLE publicaciones (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  proyecto_id INT NULL,
+  contenido TEXT,
+  tipo ENUM('texto', 'imagen', 'video') DEFAULT 'texto',
+  media_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_publicacion_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  CONSTRAINT fk_publicacion_proyecto FOREIGN KEY (proyecto_id) REFERENCES proyectos(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE reacciones_publicacion (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  publicacion_id INT NOT NULL,
+  usuario_id INT NOT NULL,
+  tipo ENUM('me_gusta', 'apoyo', 'divertido', 'triste', 'enojado') NOT NULL DEFAULT 'me_gusta',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_reaccion (publicacion_id, usuario_id),
+  CONSTRAINT fk_reaccion_publicacion FOREIGN KEY (publicacion_id) REFERENCES publicaciones(id) ON DELETE CASCADE,
+  CONSTRAINT fk_reaccion_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE comentarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  publicacion_id INT NOT NULL,
+  usuario_id INT NOT NULL,
+  contenido TEXT,
+  media_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_comentario_publicacion FOREIGN KEY (publicacion_id) REFERENCES publicaciones(id) ON DELETE CASCADE,
+  CONSTRAINT fk_comentario_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO usuarios (nombre_completo, correo, password_bcrypt, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, rol, ultima_conexion)
 VALUES
-  ('David Esteban Solano', 'david@example.com', SHA2('123456', 256), NULL, 'Estudiante de desarrollo web, trabajando en Florte', 'https://github.com/Solano08', 'https://linkedin.com/in/solano08', 'Bogota, Colombia', 'Desarrollador Full Stack', 'aprendiz', CURRENT_TIMESTAMP),
-  ('Laura Martinez', 'laura@example.com', SHA2('123456', 256), NULL, 'Disenadora enfocada en experiencias simples', 'https://github.com/lauradev', 'https://linkedin.com/in/lauradev', 'Medellin, Colombia', 'Disenadora UX', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 2 HOUR)),
-  ('Carlos Ruiz', 'carlos@example.com', SHA2('123456', 256), NULL, 'Desarrollador backend apasionado por Node.js', 'https://github.com/carlosruiz', 'https://linkedin.com/in/carlosruiz', 'Cali, Colombia', 'Desarrollador Backend', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)),
-  ('Ana Torres', 'ana@example.com', SHA2('123456', 256), NULL, 'Instructora SENA en analisis de datos', 'https://github.com/anatorres', 'https://linkedin.com/in/anatorres', 'Bogota, Colombia', 'Instructora de Datos', 'instructor', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE));
+  ('David Esteban Solano', 'david@example.com', SHA2('123456', 256), NULL, NULL, 'Estudiante de desarrollo web, trabajando en Florte', 'https://github.com/Solano08', 'https://linkedin.com/in/solano08', 'Bogota, Colombia', 'Desarrollador Full Stack', 'aprendiz', CURRENT_TIMESTAMP),
+  ('Laura Martinez', 'laura@example.com', SHA2('123456', 256), NULL, NULL, 'Disenadora enfocada en experiencias simples', 'https://github.com/lauradev', 'https://linkedin.com/in/lauradev', 'Medellin, Colombia', 'Disenadora UX', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 2 HOUR)),
+  ('Carlos Ruiz', 'carlos@example.com', SHA2('123456', 256), NULL, NULL, 'Desarrollador backend apasionado por Node.js', 'https://github.com/carlosruiz', 'https://linkedin.com/in/carlosruiz', 'Cali, Colombia', 'Desarrollador Backend', 'aprendiz', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)),
+  ('Ana Torres', 'ana@example.com', SHA2('123456', 256), NULL, NULL, 'Instructora SENA en analisis de datos', 'https://github.com/anatorres', 'https://linkedin.com/in/anatorres', 'Bogota, Colombia', 'Instructora de Datos', 'instructor', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE));
 
 INSERT INTO proyectos (titulo, descripcion, estado)
 VALUES
@@ -131,3 +169,25 @@ VALUES
   ('#JobsToBeDone', 41),
   ('#AnaliticaDeDatos', 33),
   ('#UIUX', 29);
+
+INSERT INTO publicaciones (usuario_id, proyecto_id, contenido, tipo, media_url)
+VALUES
+  (1, 1, 'Comenzamos la fase de diseno del tablero principal.', 'texto', NULL),
+  (2, 1, 'Mockups actualizados disponibles para retroalimentacion.', 'imagen', '/uploads/mockup-proyecto1.png'),
+  (3, 2, 'Se completo la integracion con la API de reportes.', 'texto', NULL),
+  (1, NULL, 'Poseemos un nuevo video tutorial sobre consultas SQL.', 'video', '/uploads/tutorial-sql.mp4');
+
+INSERT INTO reacciones_publicacion (publicacion_id, usuario_id, tipo)
+VALUES
+  (1, 2, 'apoyo'),
+  (1, 3, 'me_gusta'),
+  (2, 1, 'me_gusta'),
+  (3, 1, 'divertido'),
+  (4, 2, 'me_gusta');
+
+INSERT INTO comentarios (publicacion_id, usuario_id, contenido, media_url)
+VALUES
+  (1, 2, 'Excelente avance, revisare la documentacion.', NULL),
+  (2, 4, 'Comparto la version con correcciones de color.', '/uploads/mockup-correcciones.png'),
+  (3, 1, 'Buen trabajo equipo!', NULL),
+  (4, 3, 'El video esta muy claro, gracias.', NULL);

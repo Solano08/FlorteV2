@@ -1,30 +1,92 @@
 const db = require("../config/db");
+const { buildPublicPath } = require("../utils/fileStorage");
 
 const baseSelectFields =
-  "id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion, deleted_at";
+  "id, nombre_completo, correo, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion, deleted_at";
+
+const parsePositiveInt = (value) => {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+  return parsed;
+};
+
+const loadProfile = async (userId) => {
+  const [rows] = await db.execute(
+    `SELECT ${baseSelectFields} FROM usuarios WHERE id = ? AND deleted_at IS NULL`,
+    [userId]
+  );
+  return rows[0] ?? null;
+};
+
+const buildProfileResponse = async (userId) => {
+  const profile = await loadProfile(userId);
+
+  if (!profile) {
+    return null;
+  }
+
+  const [[projectCount]] = await db.execute(
+    "SELECT COUNT(*) AS total FROM usuario_proyectos WHERE usuario_id = ?",
+    [userId]
+  );
+
+  const [[connectionCount]] = await db.execute(
+    `
+      SELECT COUNT(*) AS total
+      FROM (
+        SELECT seguido_id AS relacionado FROM seguidores WHERE seguidor_id = ?
+        UNION
+        SELECT seguidor_id AS relacionado FROM seguidores WHERE seguido_id = ?
+      ) AS conexiones
+    `,
+    [userId, userId]
+  );
+
+  const [[courseCount]] = await db.execute(
+    "SELECT COUNT(*) AS total FROM usuario_cursos WHERE usuario_id = ?",
+    [userId]
+  );
+
+  return {
+    ...profile,
+    stats: {
+      projects: projectCount?.total ?? 0,
+      connections: connectionCount?.total ?? 0,
+      courses: courseCount?.total ?? 0,
+    },
+  };
+};
 
 exports.getProfile = async (req, res) => {
-  const userId = req.params.id;
+  const userId = parsePositiveInt(req.params.id);
+
+  if (!userId) {
+    return res.status(400).json({ error: "Identificador de usuario no valido." });
+  }
 
   try {
-    const [rows] = await db.execute(
-      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ? AND deleted_at IS NULL`,
-      [userId]
-    );
+    const profile = await buildProfileResponse(userId);
 
-    if (rows.length === 0) {
+    if (!profile) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    return res.json(rows[0]);
+    return res.json(profile);
   } catch (error) {
-    console.error("❌ Error en la consulta:", error);
+    console.error("Error en la consulta de perfil:", error);
     return res.status(500).json({ error: "Error en la base de datos" });
   }
 };
 
 exports.updateProfile = async (req, res) => {
-  const userId = req.params.id;
+  const userId = parsePositiveInt(req.params.id);
+
+  if (!userId) {
+    return res.status(400).json({ error: "Identificador de usuario no valido." });
+  }
+
   const allowedFields = [
     "nombre_completo",
     "correo",
@@ -34,6 +96,7 @@ exports.updateProfile = async (req, res) => {
     "ubicacion",
     "ocupacion",
     "avatar_url",
+    "portada_url",
   ];
 
   const entries = Object.entries(req.body).filter(([key, value]) =>
@@ -41,7 +104,7 @@ exports.updateProfile = async (req, res) => {
   );
 
   if (entries.length === 0) {
-    return res.status(400).json({ error: "No hay campos válidos para actualizar." });
+    return res.status(400).json({ error: "No hay campos validos para actualizar." });
   }
 
   const setClause = entries.map(([key]) => `${key} = ?`).join(", ");
@@ -59,20 +122,21 @@ exports.updateProfile = async (req, res) => {
         .json({ error: "Usuario no encontrado o ya eliminado" });
     }
 
-    const [rows] = await db.execute(
-      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ?`,
-      [userId]
-    );
+    const profile = await buildProfileResponse(userId);
 
-    return res.json(rows[0]);
+    return res.json(profile);
   } catch (error) {
-    console.error("❌ Error en actualización:", error);
+    console.error("Error en actualizacion de perfil:", error);
     return res.status(500).json({ error: "Error al actualizar perfil" });
   }
 };
 
 exports.deleteProfile = async (req, res) => {
-  const userId = req.params.id;
+  const userId = parsePositiveInt(req.params.id);
+
+  if (!userId) {
+    return res.status(400).json({ error: "Identificador de usuario no valido." });
+  }
 
   try {
     const [result] = await db.execute(
@@ -86,20 +150,21 @@ exports.deleteProfile = async (req, res) => {
         .json({ error: "Usuario no encontrado o ya eliminado" });
     }
 
-    const [rows] = await db.execute(
-      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ?`,
-      [userId]
-    );
+    const profile = await buildProfileResponse(userId);
 
-    return res.json(rows[0]);
+    return res.json(profile);
   } catch (error) {
-    console.error("❌ Error al eliminar perfil:", error);
+    console.error("Error al eliminar perfil:", error);
     return res.status(500).json({ error: "Error al eliminar perfil" });
   }
 };
 
 exports.restoreProfile = async (req, res) => {
-  const userId = req.params.id;
+  const userId = parsePositiveInt(req.params.id);
+
+  if (!userId) {
+    return res.status(400).json({ error: "Identificador de usuario no valido." });
+  }
 
   try {
     const [result] = await db.execute(
@@ -113,14 +178,67 @@ exports.restoreProfile = async (req, res) => {
         .json({ error: "Usuario no encontrado o no estaba eliminado" });
     }
 
-    const [rows] = await db.execute(
-      `SELECT ${baseSelectFields} FROM usuarios WHERE id = ?`,
-      [userId]
+    const profile = await buildProfileResponse(userId);
+
+    return res.json(profile);
+  } catch (error) {
+    console.error("Error al restaurar perfil:", error);
+    return res.status(500).json({ error: "Error al restaurar perfil" });
+  }
+};
+
+exports.uploadAvatar = async (req, res) => {
+  const userId = parsePositiveInt(req.params.id);
+
+  if (!userId) {
+    return res.status(400).json({ error: "Identificador de usuario no valido." });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ error: "No se recibio archivo de imagen." });
+  }
+
+  const publicPath = buildPublicPath(req.file.filename);
+
+  try {
+    await db.execute(
+      "UPDATE usuarios SET avatar_url = ? WHERE id = ? AND deleted_at IS NULL",
+      [publicPath, userId]
     );
 
-    return res.json(rows[0]);
+    const profile = await buildProfileResponse(userId);
+
+    return res.json({ avatar_url: publicPath, profile });
   } catch (error) {
-    console.error("❌ Error al restaurar perfil:", error);
-    return res.status(500).json({ error: "Error al restaurar perfil" });
+    console.error("Error al subir avatar:", error);
+    return res.status(500).json({ error: "No se pudo actualizar el avatar." });
+  }
+};
+
+exports.uploadCover = async (req, res) => {
+  const userId = parsePositiveInt(req.params.id);
+
+  if (!userId) {
+    return res.status(400).json({ error: "Identificador de usuario no valido." });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ error: "No se recibio archivo de imagen." });
+  }
+
+  const publicPath = buildPublicPath(req.file.filename);
+
+  try {
+    await db.execute(
+      "UPDATE usuarios SET portada_url = ? WHERE id = ? AND deleted_at IS NULL",
+      [publicPath, userId]
+    );
+
+    const profile = await buildProfileResponse(userId);
+
+    return res.json({ portada_url: publicPath, profile });
+  } catch (error) {
+    console.error("Error al subir portada:", error);
+    return res.status(500).json({ error: "No se pudo actualizar la portada." });
   }
 };

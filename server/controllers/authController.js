@@ -44,7 +44,7 @@ exports.register = async (req, res) => {
     );
 
     const [rows] = await db.execute(
-      `SELECT id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
+      `SELECT id, nombre_completo, correo, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
        FROM usuarios WHERE id = ?`,
       [result.insertId]
     );
@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     const [rows] = await db.execute(
-      `SELECT id, nombre_completo, correo, password_bcrypt, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
+      `SELECT id, nombre_completo, correo, password_bcrypt, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
        FROM usuarios WHERE correo = ? AND deleted_at IS NULL`,
       [normalizedEmail]
     );
@@ -91,7 +91,7 @@ exports.login = async (req, res) => {
     );
 
     const [updatedRows] = await db.execute(
-      `SELECT id, nombre_completo, correo, avatar_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
+      `SELECT id, nombre_completo, correo, avatar_url, portada_url, bio, github_url, linkedin_url, ubicacion, ocupacion, fecha_union, rol, ultima_conexion
        FROM usuarios WHERE id = ?`,
       [user.id]
     );
