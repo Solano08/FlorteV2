@@ -45,7 +45,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
+      <Route path="/" element={<Login />} />
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/grupos" element={<Grupos />} />
       <Route path="/proyectos/crear" element={<CrearProyecto />} />
